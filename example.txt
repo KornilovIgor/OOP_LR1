@@ -1,0 +1,113 @@
+main.cpp:
+
+#include <iostream>
+#include "ValidDate.h"
+
+using std::cout;
+using std::cin;
+using std::endl;
+
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    int day, month, year, ans;
+
+    ValidDate date;
+
+    cout << "Введите дату для проверки валидности." << endl;
+    cout << "День: ";   cin >> day;
+    cout << "Месяц: ";  cin >> month;
+    cout << "Год: ";    cin >> year;
+
+    date.setDate(day, month, year);
+
+    if (date.isLeap() == true) //Сообщить високосный ли год
+        cout << std::endl << year << ": високосный." << endl;
+    else
+        cout << std::endl << year << ": не високосный." << endl;
+
+    if (date.isValid() == true) //Проверка валидности даты
+        cout << std::endl << "Допустимая дата." << endl;
+    else 
+        cout << endl << "Недопустимая дата." << endl;
+
+    cout << endl;
+    system("pause");
+    return 0;
+}
+
+//////////////////////////////////////////////////////
+
+ValidDate.h:
+
+class ValidDate
+{
+private:
+    int day,
+        month,
+        year;
+    bool isRange(int, int);
+ public:
+    void setDate(int, int, int);
+    bool isValid();
+    bool isLeap();
+};
+
+///////////////////////////////////////////////////////
+
+ValidDate.cpp:
+
+#include "ValidDate.h"
+
+//ѕроверить попадание даты в допустимый диапазон
+bool ValidDate::isRange(int day_value, int last_day)
+{
+    if (1 <= day_value && day_value <= last_day)
+        return true;
+    return false;
+}
+
+//—еттер установки даты
+void ValidDate::setDate(int date_day, int date_month, int date_year)
+{
+    day = date_day;
+    month = date_month;
+    year = date_year;
+}
+
+//ћетод проверки валидности даты
+bool ValidDate::isValid()
+{
+    //≈сли мес¤ц вне диапазона - дата не валидна¤
+    if (month < 1 || month > 12)
+        return false;
+
+    //≈сли февраль: провер¤ем високосный ли год
+    if (month == 2)
+    {
+        if (isLeap() == true)
+            return isRange(day, 29);
+        else
+            return isRange(day, 28);
+    }
+
+    //≈сли мес¤ц один из 30-дневных, провер¤ем попадание даты в интервал допустимых значений
+    int months_30[4] = { 4, 6, 9, 11 };  
+    for (int i = 0; i < 4; i++)
+        if (months_30[i] == month)
+            return isRange(day, 30);
+
+    //≈сли мес¤ц в пределах допустимых, но не сработало ни одно условие ранее - мес¤ц 31-дневный
+    return isRange(day, 31);
+    
+}
+
+//ћетод проверки високосный ли год
+bool ValidDate::isLeap()
+{
+    //год ¤вл¤етс¤ високосным в двух случа¤х: либо он кратен 4, но при этом не кратен 100, либо кратен 400.
+    if (((year % 4 == 0) && (year % 100 != 0)) || (year % 400 == 0))
+        return true;
+    else
+        return false;
+}
